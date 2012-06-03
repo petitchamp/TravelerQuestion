@@ -5,7 +5,7 @@ Nothing, Dump, Take = range(3)
 
 PorterToPlace1Pattern=[(1,Dump,2),(0,Take,4)]
 				
-PorterToPlace2=[(1,Take,1),(2,Dump,2),(1,Take,1)]
+PorterToPlace2Pattern=[(1,Take,1),(2,Dump,2)]
 
 class Man:
 	# 3 numbers: place, action (dump/take | 0/1), number
@@ -91,8 +91,10 @@ class Man:
 					return False
 				return True	
 			except IndexError:
-				print "Error: man id: %d have no action for day %d", (self._Id,self._Day)
+				print "Error: man id: %d have no more action for day %d", (self._Id,self._Day)
 				return False
 		
 	def GetStat(self):
 		print "Man No.%2d Place:%2d Supply:%2d Day:%2d Mission Ended: %s" % (  self._Id, self._Place, self._Supply,self._Day, (self._MissionEnded and "Yes" or "No"))
+	def GetInfo(self):
+		return ( self._Id,self._Place,self._Supply)
