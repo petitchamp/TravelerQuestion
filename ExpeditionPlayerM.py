@@ -1,4 +1,5 @@
 import PlaceM
+import ManM
 class ExpeditionPlayer:
 	def __init__(self,iPlaceCount):
 		self._Places = []
@@ -11,6 +12,8 @@ class ExpeditionPlayer:
 		self._Mans = iMans
 		
 	def DumpStatistics(self):
+		for Place in self._Places:
+			print "Place %2d has %2d supplies" % (Place.GetDistance(),Place.GetSupplyStat())
 		return
 	def RunOneDday(self):
 		return
@@ -18,8 +21,12 @@ class ExpeditionPlayer:
 		return
 	def GetPlace(self,iPlaceNo):
 		if iPlaceNo < len(self._Places):
-			return self._Places(iPlaceNo)
+			return self._Places[iPlaceNo]
 		else: 
 			return None
 		
 ExpeditionPlayerInstance = ExpeditionPlayer(6)
+ManOne = ManM.Man(1,,ExpeditionPlayerInstance)
+for i in range(5):	
+	ManOne.RunOneDay()
+	ManOne.GetStat()

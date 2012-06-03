@@ -1,25 +1,52 @@
-import ExpeditionPlayerM
+import PlaceM
+#Man action definition
+Nothing, Dump, Take = range(3)
+
+PorterToPlace1=[(1,ManM.Dump,2),(0,ManM.Take,4),
+				(1,ManM.Dump,2),(0,ManM.Take,4),
+				(1,ManM.Dump,2),(0,ManM.Take,4),
+				(1,ManM.Dump,2),(0,ManM.Take,4),
+				(1,ManM.Dump,2),(0,ManM.Take,4),
+				(1,ManM.Dump,2),(0,ManM.Nothing,0)]
+PorterToPlace2=[(1,ManM.Take,1),(2,ManM.Dump,2),(1,ManM.Take,1)]
+
 class Man:
 	# 3 numbers: place, action (dump/take | 0/1), number
-	def __init__(self, iId,iActionList):
+	def __init__(self, iId,iActionList, iExpeditionPlayer):
 		self._ActionList = []
-		self._ActionList.append((1,0,2))
-		self._ExpeditionPlayer = ExpeditionPlayerM.ExpeditionPlayerInstance
-		self._Place = 0
-		self._Supply = 4
+		self._ActionList.append((0,Take,5)) ## take initial 4 days' supply from base
+		for (place,action,number) in iActionList:
+			self._ActionList.append((place,action,number))
+		#print self._ActionList
+		self._ExpeditionPlayer = iExpeditionPlayer
+		self._Place = -1
+		self._Supply = 0
 		self._Day = 0
-		self._Id = 0
+		self._Id = iId
 		self._MissionEnded = False
 		return
 
 	# Take supply from place
 	def TakeSupply(self, iNumber):
-		self._ExpeditionPlayer.GetPlace(self._Place).GiveSupply(iNumber)
-		return
+		if iNumber <= 0 :
+			print "[Man::TakeSupply Error] Wrong argument %d" % iNumber
+			return 0
+		Supply = self._ExpeditionPlayer.GetPlace(self._Place).ProvideSupply(iNumber)
+		self._Supply += Supply
+		return Supply
+		
 	# Dump supply to place
 	def DumpSupply(self, iNumber):
-		self._ExpeditionPlayer.GetPlace(self._Place).GetSupply(iNumber)
-		return
+		if iNumber <= 0:
+			print "[Man::TakeSupply Error] Wrong argument %d" % iNumber
+			return -1
+		elif iNumber > self._Supply:
+			print "[Man::DumpSupply Error] Man %d has only %d supply but is asked to dump %d supply on day %d" % (self._Id, self._Supply, iNumber, self._Day)
+			return -1
+		else:	
+			self._ExpeditionPlayer.GetPlace(self._Place).ReceiveSupply(iNumber)
+			self._Supply -= iNumber
+			return 0
 
 	# Run one day action
 	# - take supply from place D day if needed
@@ -29,34 +56,38 @@ class Man:
 	
 	def RunOneDay(self):
 		if self._MissionEnded == True:
-			return True
-		
-		if self._Day <= len(self._ActionList):
-			DailyAction = self._ActionList[self._Day] 
-		
+			print "Man %d is in place %d mission finished" % (self._Id,self._Place)
+			return True		
+		elif self._Day < len(self._ActionList):
+			TodayAction = self._ActionList[self._Day] 
+			#print TodayAction
 			#Go to today's destination
-			if  DailyAction[0]-self._Place == 1 :
-				self._Place = DailyAction[0]
+			if  abs((TodayAction[0]-self._Place)) <= 1 :
+				self._Place = TodayAction[0]
 			else:
-				print "Error: Man %2d is in place %d, destination %d is too far to go" , (self._Id,self._Place,DailyAction[0])
+				self.GetStat()
+				print "Error: Man %d is in place %d, destination %d is too far to go" % (self._Id,self._Place,TodayAction[0])
 				return False
-
 			#Action
-			if DailyAction[1] == 0: ## dump food
-				TakeSupply(DailyAction[2]):
-			elif DailyAction[1] == 1: ## take food
-				DumpSupply(DailyAction[2]):
-			
+			if TodayAction[2] < 0:
+				print "[Man::RunOneDay Error] Illigal take/dump number %d" %  TodayAction[2]
+				return False
+			elif TodayAction[1] == Take: ## dump food
+				if self.TakeSupply(TodayAction[2]) == 0:
+					print "[Man::RunOneDay Error] Man %2d failed to dump food on day %2d" % (self._Id, self._Day)
+					return False
+			elif TodayAction[1] == Dump: ## take food
+				if self.DumpSupply(TodayAction[2]) < 0:
+					print "[Man::RunOneDay Error] Man %2d failed to take food from place %d on day %2d" % (self._Id, self._Place, self._Day)
+					return False
 			#Increment counter
 			self._Day +=1
 			self._Supply -= 1
-			
-			if self._Day > len(self._ActionList):
-				_MissionEnded = True
-				return _MissionEnded
-				
+			if self._Day >= len(self._ActionList):
+				self._MissionEnded = True
+				return self._MissionEnded
 			elif self._Supply == 0 :
-				print "Fatal : Man %2d : I still have mission tomorrow , but I have no supply, so I die tomorrow" , _Id
+				print "Fatal : Man %2d : I still have mission tomorrow , but I have no supply, so I die tomorrow" %( self._Id)
 				return False
 			return True	
 		else:
@@ -64,4 +95,4 @@ class Man:
 			return False
 		
 	def GetStat(self):
-		print "Man No.%2d Supply: %1d Day: %2d Mission Ended: %s" (self._Id, self._Day, self._MissionEnded? "Yes" : "No")		
+		print "Man No.%2d Place:%2d Supply:%2d Day:%2d Mission Ended: %s" % (  self._Id, self._Place, self._Supply,self._Day, (self._MissionEnded and "Yes" or "No"))
