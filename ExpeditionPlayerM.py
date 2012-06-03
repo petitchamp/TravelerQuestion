@@ -26,7 +26,7 @@ class ExpeditionPlayer:
 			return None
 		
 ExpeditionPlayerInstance = ExpeditionPlayer(6)
-ManOne = ManM.Man(1,,ExpeditionPlayerInstance)
+ManOne = ManM.Man(1,ManM.PorterToPlace1Pattern,6,ExpeditionPlayerInstance)
 for i in range(5):	
 	ManOne.RunOneDay()
 	ManOne.GetStat()

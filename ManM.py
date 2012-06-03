@@ -1,22 +1,21 @@
 import PlaceM
+from collections import deque
 #Man action definition
 Nothing, Dump, Take = range(3)
 
-PorterToPlace1=[(1,ManM.Dump,2),(0,ManM.Take,4),
-				(1,ManM.Dump,2),(0,ManM.Take,4),
-				(1,ManM.Dump,2),(0,ManM.Take,4),
-				(1,ManM.Dump,2),(0,ManM.Take,4),
-				(1,ManM.Dump,2),(0,ManM.Take,4),
-				(1,ManM.Dump,2),(0,ManM.Nothing,0)]
-PorterToPlace2=[(1,ManM.Take,1),(2,ManM.Dump,2),(1,ManM.Take,1)]
+PorterToPlace1Pattern=[(1,Dump,2),(0,Take,4)]
+				
+PorterToPlace2=[(1,Take,1),(2,Dump,2),(1,Take,1)]
 
 class Man:
 	# 3 numbers: place, action (dump/take | 0/1), number
-	def __init__(self, iId,iActionList, iExpeditionPlayer):
-		self._ActionList = []
-		self._ActionList.append((0,Take,5)) ## take initial 4 days' supply from base
-		for (place,action,number) in iActionList:
-			self._ActionList.append((place,action,number))
+	def __init__(self, iId, iActionPattern, iRepeatNum, iExpeditionPlayer):
+		self._ActionList = deque()## take initial 4 days' supply from base
+		self._ActionList.append((0,Take,5))
+		
+		for i in range(iRepeatNum):
+			for (place,action,number) in iActionPattern:
+				self._ActionList.append((place,action,number))
 		#print self._ActionList
 		self._ExpeditionPlayer = iExpeditionPlayer
 		self._Place = -1
@@ -58,41 +57,42 @@ class Man:
 		if self._MissionEnded == True:
 			print "Man %d is in place %d mission finished" % (self._Id,self._Place)
 			return True		
-		elif self._Day < len(self._ActionList):
-			TodayAction = self._ActionList[self._Day] 
-			#print TodayAction
-			#Go to today's destination
-			if  abs((TodayAction[0]-self._Place)) <= 1 :
-				self._Place = TodayAction[0]
-			else:
-				self.GetStat()
-				print "Error: Man %d is in place %d, destination %d is too far to go" % (self._Id,self._Place,TodayAction[0])
-				return False
-			#Action
-			if TodayAction[2] < 0:
-				print "[Man::RunOneDay Error] Illigal take/dump number %d" %  TodayAction[2]
-				return False
-			elif TodayAction[1] == Take: ## dump food
-				if self.TakeSupply(TodayAction[2]) == 0:
-					print "[Man::RunOneDay Error] Man %2d failed to dump food on day %2d" % (self._Id, self._Day)
-					return False
-			elif TodayAction[1] == Dump: ## take food
-				if self.DumpSupply(TodayAction[2]) < 0:
-					print "[Man::RunOneDay Error] Man %2d failed to take food from place %d on day %2d" % (self._Id, self._Place, self._Day)
-					return False
-			#Increment counter
-			self._Day +=1
-			self._Supply -= 1
-			if self._Day >= len(self._ActionList):
-				self._MissionEnded = True
-				return self._MissionEnded
-			elif self._Supply == 0 :
-				print "Fatal : Man %2d : I still have mission tomorrow , but I have no supply, so I die tomorrow" %( self._Id)
-				return False
-			return True	
 		else:
-			print "Error: man id: %d have no action for day %d", (self._Id,self._Day)
-			return False
+			try :
+				TodayAction = self._ActionList.popleft() 
+				#print TodayAction
+				#Go to today's destination
+				if  abs((TodayAction[0]-self._Place)) <= 1 :
+					self._Place = TodayAction[0]
+				else:
+					self.GetStat()
+					print "Error: Man %d is in place %d, destination %d is too far to go" % (self._Id,self._Place,TodayAction[0])
+					return False
+				#Action
+				if TodayAction[2] < 0:
+					print "[Man::RunOneDay Error] Illigal take/dump number %d" %  TodayAction[2]
+					return False
+				elif TodayAction[1] == Take: ## dump food
+					if self.TakeSupply(TodayAction[2]) == 0:
+						print "[Man::RunOneDay Error] Man %2d failed to dump food on day %2d" % (self._Id, self._Day)
+						return False
+				elif TodayAction[1] == Dump: ## take food
+					if self.DumpSupply(TodayAction[2]) < 0:
+						print "[Man::RunOneDay Error] Man %2d failed to take food from place %d on day %2d" % (self._Id, self._Place, self._Day)
+						return False
+				#Increment counter
+				self._Day +=1
+				self._Supply -= 1
+				if self._Day >= len(self._ActionList):
+					self._MissionEnded = True
+					return self._MissionEnded
+				elif self._Supply == 0 :
+					print "Fatal : Man %2d : I still have mission tomorrow , but I have no supply, so I die tomorrow" %( self._Id)
+					return False
+				return True	
+			except IndexError:
+				print "Error: man id: %d have no action for day %d", (self._Id,self._Day)
+				return False
 		
 	def GetStat(self):
 		print "Man No.%2d Place:%2d Supply:%2d Day:%2d Mission Ended: %s" % (  self._Id, self._Place, self._Supply,self._Day, (self._MissionEnded and "Yes" or "No"))
