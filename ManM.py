@@ -5,7 +5,12 @@ Nothing, Dump, Take = range(3)
 
 PorterToPlace1Pattern=[(1,Dump,2),(0,Take,4)]
 				
-PorterToPlace2Pattern=[(1,Take,1),(2,Dump,2)]
+PorterToPlace2Pattern=[(1,Take,1),(2,Dump,2),
+						(1,Take,4),(2,Dump,2),
+						(1,Take,4),(2,Dump,2),
+						(1,Take,4),(2,Dump,2),
+						(1,Take,4),(2,Dump,2),						
+						(1,Take,1),(0,Nothing,2)]
 
 class Man:
 	# 3 numbers: place, action (dump/take | 0/1), number
@@ -16,9 +21,8 @@ class Man:
 		for i in range(iRepeatNum):
 			for (place,action,number) in iActionPattern:
 				self._ActionList.append((place,action,number))
-		#print self._ActionList
 		self._ExpeditionPlayer = iExpeditionPlayer
-		self._Place = -1
+		self._Place = 0
 		self._Supply = 0
 		self._Day = 0
 		self._Id = iId
@@ -83,16 +87,14 @@ class Man:
 				#Increment counter
 				self._Day +=1
 				self._Supply -= 1
-				if self._Day >= len(self._ActionList):
-					self._MissionEnded = True
-					return self._MissionEnded
-				elif self._Supply == 0 :
+				
+				if self._Supply == 0 :
 					print "Fatal : Man %2d : I still have mission tomorrow , but I have no supply, so I die tomorrow" %( self._Id)
 					return False
 				return True	
 			except IndexError:
-				print "Error: man id: %d have no more action for day %d", (self._Id,self._Day)
-				return False
+				self._MissionEnded = True
+				return self._MissionEnded
 		
 	def GetStat(self):
 		print "Man No.%2d Place:%2d Supply:%2d Day:%2d Mission Ended: %s" % (  self._Id, self._Place, self._Supply,self._Day, (self._MissionEnded and "Yes" or "No"))

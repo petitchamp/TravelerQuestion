@@ -19,6 +19,7 @@ class ExpeditionPlayer:
 	def RunOneDay(self):
 		for Man in self._Men:
 			RC = Man.RunOneDay()
+			#Man.GetStat()
 			if not RC:
 				print "Error while travelling"
 				return False
@@ -32,10 +33,15 @@ class ExpeditionPlayer:
 		
 ExpeditionPlayerInstance = ExpeditionPlayer(6)
 Men = []
-Men.append( ManM.Man(1,ManM.PorterToPlace1Pattern,6,ExpeditionPlayerInstance))
-Men.append( ManM.Man(2,ManM.PorterToPlace2Pattern,6,ExpeditionPlayerInstance))
+Repeat= 6
+Men.append( ManM.Man(1,ManM.PorterToPlace1Pattern,Repeat,ExpeditionPlayerInstance))
+Men.append( ManM.Man(2,ManM.PorterToPlace1Pattern,Repeat,ExpeditionPlayerInstance))
+Men.append( ManM.Man(3,ManM.PorterToPlace1Pattern,Repeat,ExpeditionPlayerInstance))
+Men.append( ManM.Man(4,ManM.PorterToPlace1Pattern,Repeat,ExpeditionPlayerInstance))
+Men.append( ManM.Man(5,ManM.PorterToPlace2Pattern,1,ExpeditionPlayerInstance))
+Men.append( ManM.Man(6,ManM.PorterToPlace2Pattern,1,ExpeditionPlayerInstance))
 ExpeditionPlayerInstance.SetMen(Men)
-for i in range(6):	
+for i in range(12):	
 	if not ExpeditionPlayerInstance.RunOneDay():
 		print "Error while travelling , stop simulation"
 		break
