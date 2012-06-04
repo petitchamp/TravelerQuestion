@@ -3,15 +3,37 @@ from collections import deque
 #Man action definition
 Nothing, Dump, Take = range(3)
 
-PorterToPlace1Pattern=[(1,Dump,2),(0,Take,4)]
+PorterToPlace1Pattern= [(1,Dump,2),(0,Take,4)]
 				
-PorterToPlace2Pattern=[(1,Take,1),(2,Dump,2),
+PorterToPlace2Pattern= [(1,Take,1),(2,Dump,2),
+						#(1,Take,4),(2,Dump,2),
 						(1,Take,4),(2,Dump,2),
-						(1,Take,4),(2,Dump,2),
-						(1,Take,4),(2,Dump,2),
-						(1,Take,4),(2,Dump,2),						
-						(1,Take,1),(0,Nothing,2)]
+						(1,Take,1),(0,Take,1)]
+PorterToPlace3Pattern= [(1,Take,1),(2,Take,1),
+						(3,Dump,2),(2,Take,1),
+						(1,Take,1),(0,Take,1)]
+PorterToPlace4Pattern= [(1,Take,1),(2,Take,1),
+						(3,Take,1),(4,Dump,2),
+						(3,Take,1),(2,Take,1),
+						(1,Take,1),(0,Take,1)]
+						
+Traveller = [
+			(1,Take,1),(2,Take,1),
+			(3,Take,1),(4,Take,1),
+			(5,Nothing,0),(6,Nothing,0),
+			(5,Nothing,0),(4,Take,1),
+			(3,Take,1),(2,Take,1),
+			(1,Take,1),(0,Take,1)
+]
 
+Traveller1 = [
+			(1,Nothing,1),(2,Nothing,1),
+			(3,Nothing,1),(4,Take,4),
+			(5,Nothing,0),(6,Nothing,0),
+			(5,Nothing,0),(4,Take,1),
+			(3,Take,1),(2,Take,1),
+			(1,Take,1),(0,Take,1)
+]
 class Man:
 	# 3 numbers: place, action (dump/take | 0/1), number
 	def __init__(self, iId, iActionPattern, iRepeatNum, iExpeditionPlayer):
@@ -24,7 +46,6 @@ class Man:
 		self._ExpeditionPlayer = iExpeditionPlayer
 		self._Place = 0
 		self._Supply = 0
-		self._Day = 0
 		self._Id = iId
 		self._MissionEnded = False
 		return
@@ -44,7 +65,7 @@ class Man:
 			print "[Man::TakeSupply Error] Wrong argument %d" % iNumber
 			return -1
 		elif iNumber > self._Supply:
-			print "[Man::DumpSupply Error] Man %d has only %d supply but is asked to dump %d supply on day %d" % (self._Id, self._Supply, iNumber, self._Day)
+			print "[Man::DumpSupply Error] Man %d has only %d supply but is asked to dump %d supply" % (self._Id, self._Supply, iNumber)
 			return -1
 		else:	
 			self._ExpeditionPlayer.GetPlace(self._Place).ReceiveSupply(iNumber)
@@ -78,17 +99,17 @@ class Man:
 					return False
 				elif TodayAction[1] == Take: ## dump food
 					if self.TakeSupply(TodayAction[2]) == 0:
-						print "[Man::RunOneDay Error] Man %2d failed to dump food on day %2d" % (self._Id, self._Day)
+						print "[Man::RunOneDay Error] Man %2d failed to take food from place %d" % (self._Id,self._Place)
 						return False
 				elif TodayAction[1] == Dump: ## take food
 					if self.DumpSupply(TodayAction[2]) < 0:
-						print "[Man::RunOneDay Error] Man %2d failed to take food from place %d on day %2d" % (self._Id, self._Place, self._Day)
+						print "[Man::RunOneDay Error] Man %2d failed to take food from place %d" % (self._Id, self._Place)
 						return False
 				#Increment counter
-				self._Day +=1
 				self._Supply -= 1
 				
 				if self._Supply == 0 :
+					print TodayAction
 					print "Fatal : Man %2d : I still have mission tomorrow , but I have no supply, so I die tomorrow" %( self._Id)
 					return False
 				return True	
@@ -97,6 +118,6 @@ class Man:
 				return self._MissionEnded
 		
 	def GetStat(self):
-		print "Man No.%2d Place:%2d Supply:%2d Day:%2d Mission Ended: %s" % (  self._Id, self._Place, self._Supply,self._Day, (self._MissionEnded and "Yes" or "No"))
+		print "Man No.%2d Place:%2d Supply:%2d Mission Ended: %s" % (  self._Id, self._Place, self._Supply,(self._MissionEnded and "Yes" or "No"))
 	def GetInfo(self):
 		return ( self._Id,self._Place,self._Supply)
