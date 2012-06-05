@@ -36,18 +36,13 @@ class ExpeditionPlayer:
 ExpeditionPlayerInstance = ExpeditionPlayer(6)
 Men = []
 Repeat= 3
-Men.append( ManM.Man(1,ManM.PorterToPlace1Pattern,Repeat,ExpeditionPlayerInstance))
-Men.append( ManM.Man(2,ManM.PorterToPlace1Pattern,Repeat,ExpeditionPlayerInstance))
+Men.append( ManM.Man(1,ManM.PorterToPlace1Pattern,Repeat-1,ExpeditionPlayerInstance))
+Men.append( ManM.Man(2,ManM.PorterToPlace1Pattern,Repeat-1,ExpeditionPlayerInstance))
 Men.append( ManM.Man(3,ManM.PorterToPlace1Pattern,Repeat,ExpeditionPlayerInstance))
 Men.append( ManM.Man(4,ManM.PorterToPlace1Pattern,Repeat,ExpeditionPlayerInstance))
-#Men.append( ManM.Man(5,ManM.PorterToPlace1Pattern,Repeat,ExpeditionPlayerInstance))
-#Men.append( ManM.Man(6,ManM.PorterToPlace1Pattern,Repeat,ExpeditionPlayerInstance))
-#Men.append( ManM.Man(7,ManM.PorterToPlace1Pattern,Repeat,ExpeditionPlayerInstance))
 
 Men.append( ManM.Man(8,ManM.PorterToPlace2Pattern,1,ExpeditionPlayerInstance))
 Men.append( ManM.Man(9,ManM.PorterToPlace2Pattern,1,ExpeditionPlayerInstance))
-#Men.append( ManM.Man(10,ManM.PorterToPlace2Pattern,1,ExpeditionPlayerInstance))
-#Men.append( ManM.Man(11,ManM.PorterToPlace2Pattern,1,ExpeditionPlayerInstance))
 
 Men.append( ManM.Man(12,ManM.PorterToPlace3Pattern,1,ExpeditionPlayerInstance))
 Men.append( ManM.Man(13,ManM.PorterToPlace3Pattern,1,ExpeditionPlayerInstance))
@@ -55,6 +50,7 @@ Men.append( ManM.Man(13,ManM.PorterToPlace3Pattern,1,ExpeditionPlayerInstance))
 Men.append( ManM.Man(14,ManM.PorterToPlace4Pattern,1,ExpeditionPlayerInstance))
 
 Men.append( ManM.Man(15,ManM.Traveller,1,ExpeditionPlayerInstance))
+
 ExpeditionPlayerInstance.SetMen(Men)
 for i in range(12):	
 	RC = ExpeditionPlayerInstance.RunOneDay()
